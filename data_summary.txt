@@ -1,0 +1,49 @@
+============================================================
+DATA SUMMARY
+============================================================
+
+Shape: 9,600 rows × 9 columns
+
+--- Column map ---
+  date     → date
+  id       → stock_id
+  target   → fwd_return
+  sector   → sector
+
+--- dtypes ---
+  date                                object
+  stock_id                            object
+  sector                              object
+  momentum                            float64
+  value                               float64
+  quality                             float64
+  size                                float64
+  low_vol                             float64
+  fwd_return                          float64
+
+--- Missing values ---
+  momentum                            104  (1.1%)
+  value                               101  (1.1%)
+  quality                             97  (1.0%)
+  fwd_return                          80  (0.8%)
+
+--- Numeric describe ---
+          momentum        value      quality         size      low_vol   fwd_return
+count  9496.000000  9499.000000  9503.000000  9600.000000  9600.000000  9520.000000
+mean     -0.043283     0.027454     0.075224     0.059096    -0.000683    -0.021536
+std       0.979881     1.018103     1.003136     0.977643     1.017670     1.042522
+min      -3.311623    -3.352879    -3.453525    -2.488336    -4.183870    -4.347549
+25%      -0.704542    -0.656848    -0.609276    -0.590730    -0.698210    -0.727534
+50%      -0.048614     0.013193     0.087865     0.144243    -0.003058    -0.029830
+75%       0.596065     0.697707     0.753931     0.842835     0.703766     0.677457
+max       3.899392     4.252757     3.694788     2.199893     4.548309     5.571908
+
+--- Date range ---
+  2022-01-07 00:00:00  →  2024-04-19 00:00:00
+  Unique dates: 120
+
+--- Target (fwd_return) ---
+  unique values : 9511
+  mean / std    : -0.0215 / 1.0425
+  min / max     : -4.3475 / 5.5719
+  inferred task : regression

@@ -1,0 +1,6 @@
+model,task,rmse,mae,r2,sharpe,ic,icir,ic_mean,ic_std
+Baseline,regression,1.0577,0.8411,-0.0006,0.6436,,,,
+Ridge,regression,1.0355,0.8211,0.0409,3.2699,0.2101,2.3542,0.208,0.0884
+RandomForest,regression,1.0367,0.8237,0.0387,3.1133,0.2021,2.006,0.1965,0.0979
+XGBoost,regression,1.0527,0.8343,0.0088,2.6324,0.1601,1.2592,0.1552,0.1233
+LightGBM,regression,1.0544,0.8318,0.0056,2.583,0.1633,1.5934,0.1581,0.0992
