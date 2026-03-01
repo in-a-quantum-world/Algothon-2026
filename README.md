@@ -7,7 +7,7 @@
 
 Most teams at this Algothon will submit bots built on static, rule-based strategies: fixed spread market making, textbook arbitrage, simple momentum signals. These approaches are well-understood, predictable, and fundamentally limited — they can't adapt when market conditions shift mid-competition.
 
-**AdaptiveEdge takes a fundamentally different approach.** We replace hardcoded trading logic with a live LLM agent (Google Gemini) that reasons about market microstructure in real time. Our bot ingests order book snapshots, trade flow, cross-asset correlations, and its own P&L — then makes strategic trading decisions the way a human quant trader would, but at machine speed.
+**We take a fundamentally different approach.** We replace hardcoded trading logic with a live LLM agent (Google Gemini) that reasons about market microstructure in real time. Our bot ingests order book snapshots, trade flow, cross-asset correlations, and its own P&L — then makes strategic trading decisions the way a human quant trader would, but at machine speed.
 
 This isn't just a wrapper around an API call. Our system implements a **multi-agent architecture** inspired by the TradingAgents framework (Xiao et al., UCLA/MIT, 2024), where specialised reasoning modules handle different aspects of the trading problem — market making, arbitrage detection, alpha signal generation, and risk management — and a meta-agent synthesises their outputs into coherent trade execution.
 
@@ -105,16 +105,21 @@ The evidence for LLM-based trading is compelling and recent:
 
 ## Ideas We Explored
 
-Throughout our preparation, we investigated multiple approaches before converging on the LLM agent architecture:
 
-- **Recurrent Neural Networks & LSTMs** for time-series price prediction — powerful for sequence modelling but require training data we don't have access to before the competition starts, and can't adapt to unseen market dynamics.
-- **Prediction market mechanisms** where internal agents "bet" on price direction and the consensus drives trading — intellectually elegant but adds latency and complexity without clear advantage over a single reasoning agent.
-- **Multi-agent internal trading networks** where specialised bots trade with each other to discover prices — interesting for simulation but doesn't generate real alpha on an external exchange.
-- **Self-adaptive AI agents** informed by recent research on autonomous trading systems — this concept survived and became central to our final architecture.
+## Ideas Explored During Development
 
-The common thread: every approach had value as a *concept*, but only the LLM agent could flexibly apply all of these ideas as reasoning frameworks rather than rigid implementations.
+We investigated several approaches before converging on the LLM agent architecture:
 
----
+**Recurrent Neural Networks / LSTMs** for price prediction: we prototyped an LSTM trained on rolling windows of mid-price returns to predict next-tick direction. The problem: without pre-competition training data from the CMI exchange's specific price dynamics, the model would be fitting to a distribution it hasn't seen. LSTMs are powerful sequence models but need representative training data, which isn't available until the competition starts. The LLM approach sidesteps this because it reasons about market structure rather than learning statistical patterns from historical data.
+
+**Prediction market mechanisms**: we considered an internal prediction market where multiple sub-agents "bet" on the next direction and the consensus drove trade sizing. Connects to research on wisdom-of-crowds in forecasting, but adds ~500ms of internal computation per decision. The LLM already implicitly aggregates multiple analytical perspectives in a single call, achieving the same effect with one API round-trip instead of multiple.
+
+**Multi-agent internal trading networks**: inspired by research on emergent behaviour in agent-based market simulations (Wharton School, 2024), we explored having specialised agents trade with each other to discover internal prices. However, internal trades between your own agents are zero-sum — they move capital around within your system without generating alpha on the external exchange. The valuable insight (that different strategy viewpoints should inform each other) was preserved by making the LLM reason across all strategies simultaneously in a single prompt.
+
+**Monte Carlo path simulation**: considered generating price path distributions to estimate fair value and optimal hedge ratios. Useful for derivatives pricing but the CMI exchange trades spot products, and 10,000 path simulations at ~100ms competes with the LLM call for latency budget. We chose to allocate that latency to the LLM's broader reasoning capability instead.
+
+**Self-adaptive AI agents**: research on autonomous trading agents that modify their own behaviour based on observed market regime changes (switching between trend-following and mean-reversion parametrically) was directly incorporated into the self-adaptation mechanism described above. The LLM serves as the adaptation controller, adjusting strategy parameters based on P&L feedback rather than requiring a separate regime classifier.
+
 
 
 ## Team
