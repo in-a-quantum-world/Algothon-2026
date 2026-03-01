@@ -23,17 +23,22 @@ We explored many ideas before converging on this approach: recurrent neural netw
 
 ---
 
-## Why This Is Innovative
 
-Our approach draws on cutting-edge research that most teams won't have encountered:
+## Research Foundations
 
-**Multi-Agent LLM Trading (Xiao et al., 2024):** The TradingAgents paper from UCLA and MIT demonstrated that LLM agents with specialised roles — fundamental analyst, sentiment analyst, technical analyst, risk manager — collaborating through structured debate significantly outperform traditional strategies. Their framework achieved Sharpe ratios of 5.6–8.2 across AAPL, GOOGL, and AMZN, dwarfing every baseline. We adapt this multi-agent concept to the real-time, low-latency environment of the CMI exchange.
-
-**Self-Adaptive AI Agents:** Rather than training a model offline and deploying it frozen, our agent continuously refines its strategy based on what's working. It tracks which of its reasoning patterns (market making, arbitrage, momentum) are generating P&L, and dynamically re-weights its approach. This is closer to how modern research on self-adaptive agents in financial markets envisions autonomous trading — not static rules, but live strategic evolution.
-
-**Agentic AI for Finance:** We are leveraging the Gemini API not as a simple text completion engine, but as an autonomous agent with tool access, memory, and structured decision-making. The agent receives market data, maintains conversation history as working memory, and outputs structured trade orders — a genuine agentic loop, not a one-shot prompt.
+- **TradingAgents** (Xiao et al., UCLA/MIT, 2024, arXiv:2412.20138): Multi-agent LLM framework with specialised analyst, researcher, trader, and risk manager roles. Achieved Sharpe ratios of 5.6–8.2 across AAPL, GOOGL, AMZN over June–November 2024, outperforming buy-and-hold, MACD, RSI, and SMA baselines by 6–25 percentage points in cumulative returns. We adopt the multi-role reasoning concept but collapse it into a single prompt with role-specific instruction sections, trading inter-agent communication overhead for lower latency.
+- **Emergent AI collusion in markets** (Wharton School, 2024): demonstrated that independent RL trading agents spontaneously develop coordinated pricing without explicit communication. Motivated our design choice to use an LLM that can reason about other agents' likely behaviour (e.g., "these quote patterns look like another market-making bot — avoid getting picked off") rather than treating the order book as exogenous.
+- **Avellaneda-Stoikov market making** (2008): the inventory skewing and spread calculation logic follows this framework, but with LLM-determined parameters rather than analytically derived constants, allowing adaptation to the specific microstructure of the CMI exchange.
 
 ---
+
+## Technical Stack
+
+- Python 3.12, CMI Exchange `BaseBot` framework (SSE stream, REST order API)
+- Google Gemini 2.0 Flash API (`google-genai` SDK) with structured JSON output mode
+- NumPy for rolling statistics: Pearson correlation, z-score, EWMA, rolling σ
+- Threading: SSE stream on daemon thread, Gemini calls rate-limited on main loop
+
 
 ## Why This Has Promise
 
@@ -105,22 +110,12 @@ Throughout our preparation, we investigated multiple approaches before convergin
 - **Recurrent Neural Networks & LSTMs** for time-series price prediction — powerful for sequence modelling but require training data we don't have access to before the competition starts, and can't adapt to unseen market dynamics.
 - **Prediction market mechanisms** where internal agents "bet" on price direction and the consensus drives trading — intellectually elegant but adds latency and complexity without clear advantage over a single reasoning agent.
 - **Multi-agent internal trading networks** where specialised bots trade with each other to discover prices — interesting for simulation but doesn't generate real alpha on an external exchange.
-- **Monte Carlo and Quantum Monte Carlo simulation** for path generation and option pricing — useful in theory but overkill for a spot-trading competition with no derivatives.
 - **Self-adaptive AI agents** informed by recent research on autonomous trading systems — this concept survived and became central to our final architecture.
 
 The common thread: every approach had value as a *concept*, but only the LLM agent could flexibly apply all of these ideas as reasoning frameworks rather than rigid implementations.
 
 ---
 
-## Technical Stack
-
-- **Python 3.12** with the CMI Exchange bot framework
-- **Google Gemini API** for real-time strategic reasoning
-- **Multi-agent prompt architecture** inspired by TradingAgents (arXiv:2412.20138)
-- **Structured JSON output** for reliable trade execution
-- **Sliding-window market memory** for temporal pattern recognition
-
----
 
 ## Team
 
